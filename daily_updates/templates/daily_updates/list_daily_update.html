@@ -1,0 +1,101 @@
+{% load daily_updates %}
+
+<div class="div-filter">
+    <form method="GET" action="/daily-updates/" name="filter">
+        <div class="form-group">
+            <label for="id_project">Select Project</label>
+            <select class="form-control" name="project" id="id_project">
+                <option value="" selected="">Please Select a Project</option>
+                {% for ele in projects %}
+                <option value="{{ ele.id }}">{{ ele.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="id_date">From date</label>
+
+            <input type="date" class="form-control" id="id_date_from" value="" name="from_date">
+
+        </div>
+        <div class="form-group">
+            <label for="id_date">To Date</label>
+
+            <input type="date" class="form-control" id="id_date_to" value="" name="to_date">
+
+        </div>
+
+
+        <button type="submit" id="filter_submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<h3>See Weekely Daily Update Report</h3>
+
+{% if not daily_updates %}
+<tbody>
+    <tr>
+        <div>
+            <h4>No data to show here....</h4>
+        </div>
+    </tr>
+<tbody>
+    {% else %}
+
+    <table class="table table-striped .table .table-responsive.">
+        <thead>
+            <tr>
+                <th scope="col">Project</th>
+                <th scope="col"> Billable Hrs</th>
+                <th scope="col">Billable Description</th>
+                <th scope="col">Non Billable Hrs</th>
+                <th scope="col">Non Billable Description</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+
+        {% for update in daily_updates %}
+
+        <tbody>
+            <tr>
+                <td>{{ update.project.name }}</td>
+                <td>{{ update.billable|humanize_hours }}</td>
+                <td>{{ update.description_bh }}</td>
+                <td>{{ update.non_billable|humanize_hours }}</td>
+                <td>{{ update.description_nbh }}</td>
+                <td>{{ update.date }}</td>
+            </tr>
+        </tbody>
+
+        {% endfor %}
+
+        {% endif %}
+
+    </table>
+
+    {% if is_paginated %}
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo;</a></li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+        {% for i in paginator.page_range %}
+        {% if page_obj.number == i %}
+        <li class="page-item active">
+            <a class="page-link" href="{% relative_url i 'page' params %}">{{ i }}<span class="sr-only">(current)</span></a>
+        </li>
+        {% else %}
+        {% with params=request.GET.urlencode %}
+        <li class="page-item"><a href="{% relative_url i 'page' params %}" class="page-link">{{ i }}</a></li>
+        {% endwith %}
+        {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item"><a href="?page={{ page_obj.next_page_number }}" class="page-link">&raquo;</a></li>
+        {% else %}
+        <li class="page-item disabled "><span class="page-link">&raquo;</span></li>
+        {% endif %}
+    </ul>
+    {% endif %}

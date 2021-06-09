@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block daily_updates %}active{% endblock %}
+{% block title %}Daily Update{% endblock %}
+
+{% block content %}
+
+<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal"> Create a Daily Update</button>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Submit a Daily Update</h4>
+            </div>
+            <!-- form -->
+            <form method="POST" action="/daily-updates/create-update/" name="daily_update">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="id_project">Select Project</label>
+                    <select class="form-control" name="project" id="id_project">
+                        <option value="" selected="">Please Select a Project</option>
+                        {% for project in projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" id="user" name="user" value="1">
+                <div class="form-group">
+
+                    <label for="id_billable">Billable Hours</label>
+
+                    <input type="time" class="form-control" name="billable_hours" id="id_billable" value="">
+                    <input type="hidden" id="billable" name="billable">
+
+                </div>
+                <div class="form-group">
+                    <label for="id_description_bh">Billable Description</label>
+                    <textarea class="form-control" id="description_bh" name="description_bh" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+
+                    <label for="id_non_billable">Non Billable Hours</label>
+
+                    <input type="time" name="non_billable_hours" class="form-control" id="id_non_billable" value="">
+                    <input type="hidden" id="non_billable" name="non_billable">
+
+
+                </div>
+                <div class="form-group">
+                    <label for="id_description_nbh">Non Billable Description</label>
+                    <textarea class="form-control" id="id_description_nbh" name="description_nbh" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_date">Date</label>
+
+                    <input type="date" class="form-control" id="id_date" value="" name="date">
+
+                </div>
+
+
+                <button type="submit" id="update" class="btn btn-primary">Submit</button>
+            </form>
+
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div>
+    {% include "daily_updates/list_daily_update.html" %}
+</div>
+
+
+{% endblock %}

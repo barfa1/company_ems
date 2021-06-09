@@ -1,0 +1,12 @@
+form .error {
+    color: #ff0000;
+}
+
+form {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.div-filter .form-control {
+    width: 40%;
+}

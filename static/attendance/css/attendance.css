@@ -1,0 +1,41 @@
+/*prev next middle button disabled */
+.fc-direction-ltr .fc-button-group>.fc-button:not(:first-child) {
+    display: none;
+}
+
+/*prev-button*/
+.fc-prev-button {
+    border-radius: 0.25em !important;
+}
+
+/*calender grid */
+.fc-view-harness,
+.fc-view-harness-active {
+    background-color: #D3D3D360;
+}
+
+
+/*Calendar date today*/
+.fc-day-today {
+    background-color: beige !important;
+}
+
+/*Calender date */
+.fc-daygrid-day-number {
+    position: relative;
+    right: 39%;
+    top: 6vh;
+    font-size: xx-large;
+}
+
+/*Calendar flags */
+.flag {
+    color: green;
+    /*display: inline-flex;*/
+    font-size: 1.5em;
+}
+
+/*Calendar border */
+#calendar td {
+    border: 1px solid white
+}

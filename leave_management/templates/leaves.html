@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block leave %}active{% endblock %}
+{% block title %}Leaves{% endblock %}
+
+{% block content %}
+<div style="display: block;">
+    {% if data.is_rm %}
+    <div style="display: flex; float: right">
+        <a href="/leave-management/view-requests/"><button type="button" class="btn btn-info mt-3">Requests</button></a>
+    </div>
+    {% endif %}
+    {% if data.tab == "requests" %}
+    <div style="display: flex; float: right">
+        <a href="/leave-management/"><button type="button" class="btn btn-info mt-3">Back</button></a>
+    </div>
+    {% else %}
+    <!-- Apply leave button starts here -->
+    <div>
+        <button style="margin-right: 5%;" type="button" class="btn btn-info mt-3" data-toggle="modal" data-target="#myModal">Apply</button>
+
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div style="padding-left: 5%; padding-right: 5%;" class="modal-content">
+                    <div class="modal-header">
+                        <h4 style="margin-left: -2%;" class="modal-title">Apply for leave/s</h4>
+                    </div>
+                    <!-- form -->
+                    <form method="POST" style="margin-top: 3%;">
+                        {% csrf_token %}
+                        <label style="margin-top: 2%;">From:</label>
+                        <input required id="from-date" class="form-control mb-3 date-picker-input" type="date" name="from_date" style="padding: 4px 7px;margin-top: 5px;">
+                        <label>To:</label>
+                        <input required id="to-date" class="form-control mb-3 date-picker-input" type="date" name="to_date" style="padding: 4px 7px;margin-top: 5px;">
+                        <div style="margin-top: 2%; margin-bottom: 2%;" class="md-form">
+                            <label for="form7">Reason:</label>
+                            <textarea required id="form7" name="reason" class="md-textarea form-control" rows="3"></textarea>
+                        </div>
+                        <label style="margin-top: 2%;">Leave type:</label>
+                        <select name="leave_type" required class="form-control browser-default custom-select" style="padding: 4px 7px;margin-top: 5px; margin-bottom: 2%;">
+                            {% if data.remaining_leaves > 0 %}
+                                <option selected>Select Leave Type</option>
+                                <option value="compensatory">Compensatory</option>
+                                <option value="leave">Leave</option>
+                                <option value="LOP">LOP</option>
+                            {% else %}
+                                <option selected>Select Leave Type</option>
+                                <option value="leave">Leave</option>
+                                <option value="LOP">LOP</option>
+                            {% endif %}
+                        </select>
+                        <div style="margin-top: 2%; margin-bottom: 2%;" class="form-check">
+                            <input type="checkbox" name="half_day" value="True" class="form-check-input" id="exampleCheck1">
+                            <label class="form-check-label" for="exampleCheck1">Half Day</label>
+                        </div>
+                        <div class="modal-footer">
+                            <button style="margin-right: auto; margin-left: -2.5%;" type="submit" id="update" class="btn btn-success">Submit</button>
+                            <button style="margin-right: -2.5%;" type="submit" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div>
+        <!-- Apply leave button ends here -->
+    </div>
+    {% endif %}
+</div><br>
+{% if data.tab == "leaves" %}Total Remaining leaves = {{ data.remaining_leaves }} Days{% endif %}<br>
+<hr>
+<h3>{% if data.tab == "leaves" %}Applied leaves{% else %}Requested Leaves{% endif %}</h3>
+<br>
+{% if data.tab == "leaves" %}
+<table class="table table-striped .table .table-responsive.">
+    <thead>
+        <tr>
+            <th scope="col">Applied For</th>
+            <th scope="col"> Applied On</th>
+            <th scope="col">Half day</th>
+            <th scope="col">From Date</th>
+            <th scope="col">To Date</th>
+            <th scope="col">Approval State</th>
+            <th scope="col">Leave Type</th>
+        </tr>
+    </thead>
+
+    {% for leave in data.leaves %}
+
+    <tbody>
+        <tr>
+            <td>{{ leave.reason }}</td>
+            <td>{{ leave.applying_on }}</td>
+            <td>{% if leave.is_half_day %}Yes{% else %}No{% endif %}</td>
+            <td>{{ leave.from_date }}</td>
+            <td>{{ leave.to_date }}</td>
+            <td>{{ leave.approval }}</td>
+            <td>{{ leave.leave_type }}</td>
+        </tr>
+    </tbody>
+
+    {% empty %}
+
+    <h3>No data found.</h3>
+
+    {% endfor %}
+
+</table>
+{% else %}
+<table class="table table-striped .table .table-responsive.">
+    <thead>
+        <tr>
+            <th scope="col">Employee Name</th>
+            <th scope="col">Applied For</th>
+            <th scope="col">Applied On</th>
+            <th scope="col">Half day</th>
+            <th scope="col">From Date</th>
+            <th scope="col">To Date</th>
+            <th scope="col">Leave Type</th>
+            <th scope="col">Approval State</th>
+        </tr>
+    </thead>
+
+    {% for request in data.requests %}
+
+    <tbody>
+        <tr>
+            <td class="align-middle">{{ request.employee.first_name }} {{ request.employee.last_name }}</td>
+            <td class="align-middle">{{ request.reason }}</td>
+            <td class="align-middle">{{ request.applying_on }}</td>
+            <td class="align-middle">{% if request.is_half_day %}Yes{% else %}No{% endif %}</td>
+            <td class="align-middle">{{ request.from_date }}</td>
+            <td class="align-middle">{{ request.to_date }}</td>
+            <td class="align-middle">{{ request.leave_type }}</td>
+            <td class="align-middle">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{ request.id }}" id="request_id">
+                    <select id="request_select" name="leave_type" required class="form-control browser-default custom-select" style="padding: 4px 7px;margin-top: 5px; margin-bottom: 2%;">
+                        <option selected>{% if request.approval == "approved" %}Approve{% elif request.approval == "denied" %}Deny{% else %}Pending{% endif %}</option>
+                        {% if request.approval == "pending" %}
+                        <option value="denied">Deny</option>
+                        <option value="approved">Approve</option>
+                        {% elif request.approval == "denied" %}
+                        <option value="approved">Approve</option>
+                        {% else %}
+                        <option value="denied">Deny</option>
+                        {% endif %}
+                    </select>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+
+    {% empty %}
+
+    <h3>No data found.</h3>
+
+    {% endfor %}
+
+</table>
+
+<script>
+    $("#request_select").change(function () {
+        console.log("Select option changes",this.value,$("#user_email").value)
+        $.ajax({
+              url:'/leave-management/change-request-approval/',
+              data:{
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                    action: 'post',
+                    approval:this.value,
+                    request_id:$('input[id=request_id]').val(),
+                },
+              type:'post',
+              dataType:'json',
+              success:function(response){
+                  console.log(response.message)
+                  window.alert(response.message)
+              }
+            })
+    });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load holiday %}
+{% block content %}
+
+<div class="container">
+    <h2>Holidays</h2>
+    <table class="table ">
+        <thead class="thead-light">
+            <tr>
+                <th>Holiday</th>
+                <th>Date</th>
+                <th>Day</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for holiday in holidays %}
+            <tr>
+                <td>{{ holiday.name }}</td>
+                <td>{{ holiday.date }}</td>
+                <td>{{ holiday.date|get_day }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h2>Optional Holidays </h2>
+    <table class="table ">
+        <thead class="thead-light">
+            <tr>
+                <th>Holiday</th>
+                <th>Date</th>
+                <th>Day</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for holiday in optionals %}
+            <tr>
+                <td>{{ holiday.name }}</td>
+                <td>{{ holiday.date }}</td>
+                <td>{{ holiday.date|get_day}}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
